@@ -1,0 +1,307 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>蔬菜溯源查询</title>
+    <style>
+        body {
+            font-family: "Microsoft Yahei", Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 30px; /* 加大页面内边距，整体更宽松 */
+            font-size: 18px; /* 全局基准字体放大 */
+        }
+        .search-box {
+            max-width: 900px; /* 加大搜索框容器宽度 */
+            margin: 0 auto 30px; /* 加大底部间距 */
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 20px; /* 加大搜索框内边距，按钮更大 */
+            font-size: 22px; /* 搜索框字体放大 */
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+        /* 溯源卡片样式（整体放大） */
+        .trace-card {
+            max-width: 900px; /* 加大卡片宽度 */
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            padding: 45px; /* 加大卡片内边距，内容更宽松 */
+            display: none; /* 初始隐藏 */
+        }
+        .trace-title {
+            color: #2e8b57;
+            font-size: 42px; /* 标题字体大幅放大 */
+            text-align: center;
+            margin: 0 0 40px; /* 加大底部间距 */
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .trace-item {
+            font-size: 26px; /* 内容字体大幅放大 */
+            line-height: 2.5; /* 加大行高，更易读 */
+            margin: 15px 0; /* 加大行间距 */
+        }
+        .trace-label {
+            font-weight: bold;
+            color: #333;
+            display: inline-block;
+            min-width: 160px; /* 加大标签宽度，对齐更美观 */
+        }
+        .trace-value {
+            color: #555;
+        }
+        /* 新增：检测报告图片组容器 */
+        .report-img-group {
+            display: flex;
+            flex-wrap: wrap; /* 自动换行 */
+            gap: 20px; /* 图片之间的间距 */
+            margin-top: 15px;
+        }
+        .report-img {
+            max-width: 250px; /* 多图时缩小单张缩略图宽度，避免溢出 */
+            height: auto;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .report-img:hover {
+            transform: scale(1.03);
+        }
+        /* 无结果提示 */
+        .no-result {
+            max-width: 900px;
+            margin: 0 auto;
+            color: #dc3545;
+            text-align: center;
+            padding: 50px 20px; /* 加大提示框内边距 */
+            font-size: 26px; /* 提示文字放大 */
+            background: #fff;
+            border-radius: 15px;
+            display: none;
+        }
+        /* 图片预览弹窗 */
+        .img-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            cursor: pointer; /* 大图显示点击手势，提示可点击返回 */
+        }
+        .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: white;
+            font-size: 48px; /* 关闭按钮放大 */
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="请输入商品名/编码进行搜索...">
+    </div>
+
+    <!-- 无结果提示 -->
+    <div class="no-result" id="noResult">未找到匹配的商品信息</div>
+
+    <!-- 商品溯源卡片（每个商品一个卡片） -->
+     <div class="trace-card" data-code="20260211YMCaaSFA-001">
+        <h2 class="trace-title">油麦菜 产品溯源信息</h2>
+        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">油麦菜</span></div>
+        <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-11</span></div>
+        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">aa</span></div>
+        <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福A-001</span></div>
+        <div class="trace-item">
+            <span class="trace-label">检测报告：</span>
+            <!-- 改成图片组容器，支持多张图片 -->
+            <div class="report-img-group">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="油麦菜检测报告1" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="油麦菜检测报告2" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="油麦菜检测报告3" onclick="openImgModal(this.src)">
+            </div>
+        </div>
+        <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
+    </div>
+
+    <div class="trace-card" data-code="20260212WSxglgPX1-1">
+        <h2 class="trace-title">莴笋 产品溯源信息</h2>
+        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">莴笋</span></div>
+        <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-12</span></div>
+        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">xglg</span></div>
+        <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">盘溪1-1</span></div>
+        <div class="trace-item">
+            <span class="trace-label">检测报告：</span>
+            <div class="report-img-group">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="莴笋检测报告1" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="莴笋检测报告2" onclick="openImgModal(this.src)">
+            </div>
+        </div>
+        <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
+    </div>
+
+    <div class="trace-card" data-code="20260212XLHZQSFc-34">
+        <h2 class="trace-title">西兰花 产品溯源信息</h2>
+        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">西兰花</span></div>
+        <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-12</span></div>
+        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">重庆</span></div>
+        <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福c-34</span></div>
+        <div class="trace-item">
+            <span class="trace-label">检测报告：</span>
+            <!-- 单张图片也兼容，保留容器即可 -->
+            <div class="report-img-group">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="西兰花检测报告" onclick="openImgModal(this.src)">
+            </div>
+        </div>
+        <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
+    </div>
+
+    <div class="trace-card" data-code="20260213TDGZSFD-28">
+        <h2 class="trace-title">土豆 产品溯源信息</h2>
+        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">土豆</span></div>
+        <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-13</span></div>
+        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">贵州</span></div>
+        <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福D-28</span></div>
+        <div class="trace-item">
+            <span class="trace-label">检测报告：</span>
+            <div class="report-img-group">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="土豆检测报告1" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="土豆检测报告2" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="土豆检测报告3" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="土豆检测报告4" onclick="openImgModal(this.src)">
+            </div>
+        </div>
+        <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
+    </div>
+
+    <div class="trace-card" data-code="20260215HCPZHPX2-2">
+        <h2 class="trace-title">花菜 产品溯源信息</h2>
+        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">花菜</span></div>
+        <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-15</span></div>
+        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">攀枝花</span></div>
+        <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">盘溪2-2</span></div>
+        <div class="trace-item">
+            <span class="trace-label">检测报告：</span>
+            <div class="report-img-group">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="花菜检测报告" onclick="openImgModal(this.src)">
+            </div>
+        </div>
+        <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
+    </div>
+
+    <div class="trace-card" data-code="20260227DFZQSF8-8">
+        <h2 class="trace-title">豆腐 产品溯源信息</h2>
+        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">豆腐</span></div>
+        <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-27</span></div>
+        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">重庆</span></div>
+        <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福8-8</span></div>
+        <div class="trace-item">
+            <span class="trace-label">检测报告：</span>
+            <div class="report-img-group">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="豆腐检测报告1" onclick="openImgModal(this.src)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="豆腐检测报告2" onclick="openImgModal(this.src)">
+            </div>
+        </div>
+        <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
+    </div>
+
+    <!-- 图片预览弹窗 -->
+    <div class="img-modal" id="imgModal">
+        <span class="close-modal" onclick="closeImgModal()">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const traceCards = document.querySelectorAll('.trace-card');
+        const noResult = document.getElementById('noResult');
+        const imgModal = document.getElementById('imgModal');
+        const modalImg = document.getElementById('modalImg');
+
+        // 初始化：隐藏所有内容
+        function initPage() {
+            traceCards.forEach(card => card.style.display = 'none');
+            noResult.style.display = 'none';
+        }
+        initPage();
+
+        // 解析URL参数
+        function getUrlParam(name) {
+            const params = new URL(window.location.href).searchParams;
+            const value = params.get(name);
+            return value ? value.trim() : '';
+        }
+
+        // 核心搜索函数
+        function handleSearch(filter) {
+            initPage();
+            if (!filter || filter.trim() === '') return;
+
+            let hasMatch = false;
+            const lowerFilter = filter.toLowerCase().trim();
+
+            traceCards.forEach(card => {
+                const productName = card.querySelector('.trace-value').textContent.toLowerCase();
+                const productCode = card.dataset.code.toLowerCase();
+
+                if (productName.includes(lowerFilter) || productCode.includes(lowerFilter)) {
+                    hasMatch = true;
+                    card.style.display = 'block';
+                    if (filter.trim() === card.dataset.code) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+
+            noResult.style.display = hasMatch ? 'none' : 'block';
+        }
+
+        // 手动搜索
+        searchInput.addEventListener('input', function() {
+            handleSearch(this.value.trim());
+        });
+
+        // 扫码自动填充+搜索
+        window.addEventListener('load', function() {
+            const code = getUrlParam('code');
+            if (code) {
+                searchInput.value = code;
+                handleSearch(code);
+            }
+        });
+
+        // 图片预览功能（支持多张图片放大）
+        function openImgModal(imgSrc) {
+            imgModal.style.display = 'flex';
+            modalImg.src = imgSrc;
+        }
+        function closeImgModal() {
+            imgModal.style.display = 'none';
+        }
+        // 点击弹窗空白处关闭
+        imgModal.addEventListener('click', e => {
+            if (e.target === imgModal) closeImgModal();
+        });
+        // 点击放大后的图片直接关闭弹窗（缩回原界面）
+        modalImg.addEventListener('click', function() {
+            closeImgModal();
+        });
+    </script>
+</body>
+</html>
