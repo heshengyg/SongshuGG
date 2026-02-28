@@ -83,7 +83,7 @@
             border-radius: 15px;
             display: none;
         }
-        /* 图片预览弹窗（保留翻页按钮样式） */
+        /* 图片预览弹窗（移除翻页按钮样式） */
         .img-modal {
             display: none;
             position: fixed;
@@ -95,7 +95,7 @@
             z-index: 9999;
             justify-content: center;
             align-items: center;
-            touch-action: pan-y; /* 允许垂直滑动，避免影响其他操作 */
+            touch-action: pan-x; /* 允许水平滑动，避免影响上下翻页 */
         }
         .modal-content {
             max-width: 95%;
@@ -113,34 +113,7 @@
             font-weight: bold;
             cursor: pointer;
         }
-        /* 翻页按钮样式 */
-        .modal-nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
-            background-color: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            color: white;
-            font-size: 36px;
-            text-align: center;
-            line-height: 60px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border: none;
-            outline: none;
-        }
-        .modal-nav-btn:hover {
-            background-color: rgba(255,255,255,0.5);
-        }
-        .prev-btn {
-            left: 30px;
-        }
-        .next-btn {
-            right: 30px;
-        }
-        /* 页码提示 */
+        /* 页码提示（保留） */
         .modal-page-info {
             position: absolute;
             bottom: 30px;
@@ -277,11 +250,9 @@
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
     </div>
 
-    <!-- 图片预览弹窗 -->
+    <!-- 图片预览弹窗（移除翻页按钮） -->
     <div class="img-modal" id="imgModal">
         <span class="close-modal" onclick="closeImgModal()">&times;</span>
-        <button class="modal-nav-btn prev-btn" onclick="changePage(-1)">&lt;</button>
-        <button class="modal-nav-btn next-btn" onclick="changePage(1)">&gt;</button>
         <div class="modal-page-info" id="pageInfo">1/1</div>
         <img class="modal-content" id="modalImg" onclick="closeImgModal()">
     </div>
@@ -296,9 +267,9 @@
         let currentImgGroup = null;
         let currentIndex = 0;
         
-        // 滑动相关变量
-        let touchStartX = 0;
-        let touchEndX = 0;
+        // 上下滑动相关变量
+        let touchStartY = 0;
+        let touchEndY = 0;
         const SWIPE_THRESHOLD = 50; // 滑动阈值（像素），小于该值不触发翻页
 
         // 初始化
@@ -373,12 +344,9 @@
             if (!currentImgGroup || currentImgGroup.length === 0) return;
             modalImg.src = currentImgGroup[currentIndex];
             pageInfo.textContent = `${currentIndex + 1}/${currentImgGroup.length}`;
-            // 单图时隐藏翻页按钮
-            document.querySelector('.prev-btn').style.display = currentImgGroup.length > 1 ? 'block' : 'none';
-            document.querySelector('.next-btn').style.display = currentImgGroup.length > 1 ? 'block' : 'none';
         }
 
-        // 翻页功能
+        // 翻页功能（仅保留逻辑，移除按钮调用）
         function changePage(step) {
             if (!currentImgGroup || currentImgGroup.length <= 1) return;
             currentIndex += step;
@@ -391,45 +359,45 @@
             updateModalContent();
         }
 
-        // 监听滑动开始（触摸/鼠标）
+        // 监听上下滑动开始（触摸/鼠标）
         modalImg.addEventListener('touchstart', handleTouchStart, false);
         modalImg.addEventListener('mousedown', handleMouseDown, false);
 
-        // 监听滑动结束（触摸/鼠标）
+        // 监听上下滑动结束（触摸/鼠标）
         modalImg.addEventListener('touchend', handleTouchEnd, false);
         modalImg.addEventListener('mouseup', handleMouseUp, false);
         modalImg.addEventListener('mouseleave', handleMouseUp, false);
 
-        // 触摸开始事件
+        // 触摸开始事件（记录Y轴起始位置）
         function handleTouchStart(e) {
-            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
         }
 
-        // 鼠标按下事件（兼容PC端滑动）
+        // 鼠标按下事件（兼容PC端，记录Y轴起始位置）
         function handleMouseDown(e) {
-            touchStartX = e.screenX;
+            touchStartY = e.screenY;
         }
 
-        // 触摸结束事件
+        // 触摸结束事件（记录Y轴结束位置）
         function handleTouchEnd(e) {
-            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
             handleSwipe();
         }
 
-        // 鼠标松开事件（兼容PC端）
+        // 鼠标松开事件（兼容PC端，记录Y轴结束位置）
         function handleMouseUp(e) {
-            touchEndX = e.screenX;
+            touchEndY = e.screenY;
             handleSwipe();
         }
 
-        // 处理滑动逻辑
+        // 处理上下滑动逻辑
         function handleSwipe() {
-            const swipeDiff = touchStartX - touchEndX;
-            // 左滑（从右往左）→ 下一页
+            const swipeDiff = touchStartY - touchEndY;
+            // 上滑（手指从下往上滑）→ 下一页
             if (swipeDiff > SWIPE_THRESHOLD) {
                 changePage(1);
             }
-            // 右滑（从左往右）→ 上一页
+            // 下滑（手指从上往下滑）→ 上一页
             else if (swipeDiff < -SWIPE_THRESHOLD) {
                 changePage(-1);
             }
