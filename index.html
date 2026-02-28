@@ -1,68 +1,68 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>蔬菜溯源查询</title>
+    <title>松鼠逛逛产品溯源查询</title>
     <style>
         body {
             font-family: "Microsoft Yahei", Arial, sans-serif;
             background-color: #f9f9f9;
             margin: 0;
-            padding: 30px; /* 加大页面内边距，整体更宽松 */
-            font-size: 18px; /* 全局基准字体放大 */
+            padding: 40px; /* 保持原有内边距 */
+            font-size: 22px; /* 保持原有全局字体大小 */
         }
         .search-box {
-            max-width: 900px; /* 加大搜索框容器宽度 */
-            margin: 0 auto 30px; /* 加大底部间距 */
+            max-width: 820px; /* 保持原有宽度 */
+            margin: 0 auto 30px; /* 保持原有间距 */
         }
         input[type="text"] {
             width: 100%;
-            padding: 18px 20px; /* 加大搜索框内边距，按钮更大 */
-            font-size: 22px; /* 搜索框字体放大 */
+            padding: 30px 30px; /* 保持原有内边距 */
+            font-size: 32px; /* 保持原有搜索框字体 */
             border: 1px solid #ddd;
             border-radius: 10px;
             box-sizing: border-box;
         }
-        /* 溯源卡片样式（整体放大） */
+        /* 溯源卡片样式（保持原有尺寸） */
         .trace-card {
-            max-width: 900px; /* 加大卡片宽度 */
+            max-width: 700px; /* 保持原有宽度 */
             margin: 0 auto;
             background: #fff;
             border-radius: 15px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            padding: 45px; /* 加大卡片内边距，内容更宽松 */
+            padding: 60px; /* 保持原有内边距 */
             display: none; /* 初始隐藏 */
         }
         .trace-title {
             color: #2e8b57;
-            font-size: 42px; /* 标题字体大幅放大 */
+            font-size: 48px; /* 保持原有标题字体 */
             text-align: center;
-            margin: 0 0 40px; /* 加大底部间距 */
+            margin: 0 0 40px; /* 保持原有间距 */
             font-weight: 600;
             line-height: 1.3;
         }
         .trace-item {
-            font-size: 26px; /* 内容字体大幅放大 */
-            line-height: 2.5; /* 加大行高，更易读 */
-            margin: 15px 0; /* 加大行间距 */
+            font-size: 40px; /* 保持原有内容字体 */
+            line-height: 2.5; /* 保持原有行高 */
+            margin: 15px 0; /* 保持原有行间距 */
         }
         .trace-label {
             font-weight: bold;
             color: #333;
             display: inline-block;
-            min-width: 160px; /* 加大标签宽度，对齐更美观 */
+            min-width: 160px; /* 保持原有标签宽度 */
         }
         .trace-value {
             color: #555;
         }
-        /* 新增：检测报告图片组容器 */
+        /* 新增：检测报告图片组（竖排） */
         .report-img-group {
             display: flex;
-            flex-wrap: wrap; /* 自动换行 */
-            gap: 20px; /* 图片之间的间距 */
+            flex-direction: column; /* 竖排布局 */
+            gap: 20px; /* 图片上下间距 */
             margin-top: 15px;
         }
         .report-img {
-            max-width: 250px; /* 多图时缩小单张缩略图宽度，避免溢出 */
+            max-width: 500px; /* 保持原有缩微图尺寸 */
             height: auto;
             border-radius: 8px;
             cursor: pointer;
@@ -71,19 +71,19 @@
         .report-img:hover {
             transform: scale(1.03);
         }
-        /* 无结果提示 */
+        /* 无结果提示（保持原有样式） */
         .no-result {
             max-width: 900px;
             margin: 0 auto;
             color: #dc3545;
             text-align: center;
-            padding: 50px 20px; /* 加大提示框内边距 */
-            font-size: 26px; /* 提示文字放大 */
+            padding: 20px 20px; /* 保持原有内边距 */
+            font-size: 40px; /* 保持原有提示字体 */
             background: #fff;
             border-radius: 15px;
             display: none;
         }
-        /* 图片预览弹窗 */
+        /* 图片预览弹窗（新增翻页按钮样式） */
         .img-modal {
             display: none;
             position: fixed;
@@ -97,19 +97,56 @@
             align-items: center;
         }
         .modal-content {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 95%;
+            max-height: 95%;
             border-radius: 10px;
-            cursor: pointer; /* 大图显示点击手势，提示可点击返回 */
+            cursor: pointer; /* 保持点击返回手势 */
         }
         .close-modal {
             position: absolute;
             top: 30px;
             right: 40px;
             color: white;
-            font-size: 48px; /* 关闭按钮放大 */
+            font-size: 48px; /* 保持原有关闭按钮大小 */
             font-weight: bold;
             cursor: pointer;
+        }
+        /* 翻页按钮样式 */
+        .modal-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            color: white;
+            font-size: 36px;
+            text-align: center;
+            line-height: 60px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            outline: none;
+        }
+        .modal-nav-btn:hover {
+            background-color: rgba(255,255,255,0.5);
+        }
+        .prev-btn {
+            left: 30px;
+        }
+        .next-btn {
+            right: 30px;
+        }
+        /* 页码提示 */
+        .modal-page-info {
+            position: absolute;
+            bottom: 30px;
+            color: white;
+            font-size: 24px;
+            background-color: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -121,8 +158,8 @@
     <!-- 无结果提示 -->
     <div class="no-result" id="noResult">未找到匹配的商品信息</div>
 
-    <!-- 商品溯源卡片（每个商品一个卡片） -->
-     <div class="trace-card" data-code="20260211YMCaaSFA-001">
+    <!-- 商品溯源卡片（每个商品一个卡片，新增多图竖排） -->
+    <div class="trace-card" data-code="20260211YMCaaSFA-001">
         <h2 class="trace-title">油麦菜 产品溯源信息</h2>
         <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">油麦菜</span></div>
         <div class="trace-item"><span class="trace-label">生产日期：</span><span class="trace-value">2026-02-11</span></div>
@@ -130,11 +167,15 @@
         <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福A-001</span></div>
         <div class="trace-item">
             <span class="trace-label">检测报告：</span>
-            <!-- 改成图片组容器，支持多张图片 -->
-            <div class="report-img-group">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="油麦菜检测报告1" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="油麦菜检测报告2" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="油麦菜检测报告3" onclick="openImgModal(this.src)">
+            <!-- 油麦菜多图竖排 -->
+            <div class="report-img-group" data-imgs='[
+                "https://s41.ax1x.com/2026/02/26/pZxyblj.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
+            ]'>
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="油麦菜检测报告1" onclick="openImgModal(this.parentElement, 0)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="油麦菜检测报告2" onclick="openImgModal(this.parentElement, 1)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="油麦菜检测报告3" onclick="openImgModal(this.parentElement, 2)">
             </div>
         </div>
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
@@ -148,9 +189,13 @@
         <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">盘溪1-1</span></div>
         <div class="trace-item">
             <span class="trace-label">检测报告：</span>
-            <div class="report-img-group">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="莴笋检测报告1" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="莴笋检测报告2" onclick="openImgModal(this.src)">
+            <!-- 莴笋多图竖排 -->
+            <div class="report-img-group" data-imgs='[
+                "https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg"
+            ]'>
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="莴笋检测报告1" onclick="openImgModal(this.parentElement, 0)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="莴笋检测报告2" onclick="openImgModal(this.parentElement, 1)">
             </div>
         </div>
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
@@ -164,9 +209,11 @@
         <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福c-34</span></div>
         <div class="trace-item">
             <span class="trace-label">检测报告：</span>
-            <!-- 单张图片也兼容，保留容器即可 -->
-            <div class="report-img-group">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="西兰花检测报告" onclick="openImgModal(this.src)">
+            <!-- 西兰花单图（兼容竖排） -->
+            <div class="report-img-group" data-imgs='[
+                "https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
+            ]'>
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="西兰花检测报告" onclick="openImgModal(this.parentElement, 0)">
             </div>
         </div>
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
@@ -180,11 +227,17 @@
         <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福D-28</span></div>
         <div class="trace-item">
             <span class="trace-label">检测报告：</span>
-            <div class="report-img-group">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="土豆检测报告1" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="土豆检测报告2" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="土豆检测报告3" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="土豆检测报告4" onclick="openImgModal(this.src)">
+            <!-- 土豆多图竖排 -->
+            <div class="report-img-group" data-imgs='[
+                "https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyblj.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg"
+            ]'>
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="土豆检测报告1" onclick="openImgModal(this.parentElement, 0)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="土豆检测报告2" onclick="openImgModal(this.parentElement, 1)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="土豆检测报告3" onclick="openImgModal(this.parentElement, 2)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="土豆检测报告4" onclick="openImgModal(this.parentElement, 3)">
             </div>
         </div>
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
@@ -198,8 +251,11 @@
         <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">盘溪2-2</span></div>
         <div class="trace-item">
             <span class="trace-label">检测报告：</span>
-            <div class="report-img-group">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="花菜检测报告" onclick="openImgModal(this.src)">
+            <!-- 花菜单图（兼容竖排） -->
+            <div class="report-img-group" data-imgs='[
+                "https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg"
+            ]'>
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="花菜检测报告" onclick="openImgModal(this.parentElement, 0)">
             </div>
         </div>
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
@@ -213,18 +269,28 @@
         <div class="trace-item"><span class="trace-label">商户名：</span><span class="trace-value">双福8-8</span></div>
         <div class="trace-item">
             <span class="trace-label">检测报告：</span>
-            <div class="report-img-group">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="豆腐检测报告1" onclick="openImgModal(this.src)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="豆腐检测报告2" onclick="openImgModal(this.src)">
+            <!-- 豆腐多图竖排 -->
+            <div class="report-img-group" data-imgs='[
+                "https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg",
+                "https://s41.ax1x.com/2026/02/26/pZxyblj.jpg"
+            ]'>
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="豆腐检测报告1" onclick="openImgModal(this.parentElement, 0)">
+                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="豆腐检测报告2" onclick="openImgModal(this.parentElement, 1)">
             </div>
         </div>
         <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
     </div>
 
-    <!-- 图片预览弹窗 -->
+    <!-- 图片预览弹窗（新增翻页按钮和页码） -->
     <div class="img-modal" id="imgModal">
         <span class="close-modal" onclick="closeImgModal()">&times;</span>
-        <img class="modal-content" id="modalImg">
+        <!-- 上一页按钮 -->
+        <button class="modal-nav-btn prev-btn" onclick="changePage(-1)">&lt;</button>
+        <!-- 下一页按钮 -->
+        <button class="modal-nav-btn next-btn" onclick="changePage(1)">&gt;</button>
+        <!-- 页码提示 -->
+        <div class="modal-page-info" id="pageInfo">1/1</div>
+        <img class="modal-content" id="modalImg" onclick="closeImgModal()">
     </div>
 
     <script>
@@ -233,6 +299,10 @@
         const noResult = document.getElementById('noResult');
         const imgModal = document.getElementById('imgModal');
         const modalImg = document.getElementById('modalImg');
+        const pageInfo = document.getElementById('pageInfo');
+        // 全局变量存储当前图片组和当前页码
+        let currentImgGroup = null;
+        let currentIndex = 0;
 
         // 初始化：隐藏所有内容
         function initPage() {
@@ -286,21 +356,54 @@
             }
         });
 
-        // 图片预览功能（支持多张图片放大）
-        function openImgModal(imgSrc) {
+        // 打开图片预览（支持多图翻页）
+        function openImgModal(imgGroup, index) {
+            // 存储当前图片组和索引
+            currentImgGroup = JSON.parse(imgGroup.dataset.imgs);
+            currentIndex = index;
+            // 更新图片和页码
+            updateModalContent();
+            // 显示弹窗
             imgModal.style.display = 'flex';
-            modalImg.src = imgSrc;
         }
+
+        // 关闭图片预览
         function closeImgModal() {
             imgModal.style.display = 'none';
+            // 重置全局变量
+            currentImgGroup = null;
+            currentIndex = 0;
         }
+
+        // 更新弹窗内容（图片+页码）
+        function updateModalContent() {
+            if (!currentImgGroup || currentImgGroup.length === 0) return;
+            // 设置当前图片
+            modalImg.src = currentImgGroup[currentIndex];
+            // 更新页码提示
+            pageInfo.textContent = `${currentIndex + 1}/${currentImgGroup.length}`;
+            // 控制翻页按钮显示（单图时隐藏）
+            document.querySelector('.prev-btn').style.display = currentImgGroup.length > 1 ? 'block' : 'none';
+            document.querySelector('.next-btn').style.display = currentImgGroup.length > 1 ? 'block' : 'none';
+        }
+
+        // 翻页功能
+        function changePage(step) {
+            if (!currentImgGroup || currentImgGroup.length <= 1) return;
+            // 计算新索引（循环翻页）
+            currentIndex += step;
+            if (currentIndex < 0) {
+                currentIndex = currentImgGroup.length - 1;
+            } else if (currentIndex >= currentImgGroup.length) {
+                currentIndex = 0;
+            }
+            // 更新内容
+            updateModalContent();
+        }
+
         // 点击弹窗空白处关闭
         imgModal.addEventListener('click', e => {
             if (e.target === imgModal) closeImgModal();
-        });
-        // 点击放大后的图片直接关闭弹窗（缩回原界面）
-        modalImg.addEventListener('click', function() {
-            closeImgModal();
         });
     </script>
 </body>
