@@ -1,7 +1,6 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 关键修复1：添加微信浏览器适配meta标签 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="no-referrer">
     <title>松鼠逛逛产品溯源查询</title>
@@ -94,7 +93,7 @@
             z-index: 9999;
             justify-content: center;
             align-items: center;
-            touch-action: manipulation; /* 关键修复2：修改触摸行为属性 */
+            touch-action: manipulation;
         }
         .modal-content {
             max-width: 95%;
@@ -110,7 +109,7 @@
             font-size: 48px;
             font-weight: bold;
             cursor: pointer;
-            z-index: 10000; /* 确保关闭按钮层级最高 */
+            z-index: 10000;
         }
         .modal-nav-btn {
             position: absolute;
@@ -128,7 +127,7 @@
             transition: background-color 0.2s;
             border: none;
             outline: none;
-            z-index: 10000; /* 确保翻页按钮层级最高 */
+            z-index: 10000;
         }
         .modal-nav-btn:hover {
             background-color: rgba(255,255,255,0.5);
@@ -149,6 +148,16 @@
             border-radius: 20px;
             z-index: 10000;
         }
+        /* 加载提示样式 */
+        .loading {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 40px;
+            font-size: 40px;
+            color: #2e8b57;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -156,138 +165,16 @@
         <input type="text" id="searchInput" placeholder="请输入商品名/编码进行搜索...">
     </div>
 
+    <!-- 无结果提示 -->
     <div class="no-result" id="noResult">未找到匹配的商品信息</div>
+    
+    <!-- 加载提示 -->
+    <div class="loading" id="loading">正在加载产品数据...</div>
 
-    <div class="trace-card" data-code="XST （JBZ）Y250gSDSFA-001">
-        <h2 class="trace-title">新蒜苔 （精包装）约250g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">新蒜苔 （精包装）约250g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">山东</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">重庆洁米诺米业连锁有限公司</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-4℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <!-- 关键修复3：简化图片组数据存储方式 -->
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg"
-                 data-img-1="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg"
-                 data-img-2="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
-                 data-img-3="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg"
-                 data-img-4="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
-                 data-img-count="5">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyblj.jpg" alt="新蒜苔 （精包装）约250g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="新蒜苔 （精包装）约250g检测报告2" onclick="openImgModal(this.parentElement, 1)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="新蒜苔 （精包装）约250g检测报告3" onclick="openImgModal(this.parentElement, 2)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="新蒜苔 （精包装）约250g检测报告4" onclick="openImgModal(this.parentElement, 3)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="新蒜苔 （精包装）约250g检测报告5" onclick="openImgModal(this.parentElement, 4)">
-            </div>
-        </div>
-    </div>
+    <!-- 产品卡片容器（动态生成卡片） -->
+    <div id="productCardsContainer"></div>
 
-    <div class="trace-card" data-code="PEB （JBZ）Y400gZQPX1-1">
-        <h2 class="trace-title">瓢儿白 （精包装）约400g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">瓢儿白 （精包装）约400g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">重庆</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">重庆洁米诺米业连锁有限公司</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-5℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg"
-                 data-img-count="1">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyq6s.jpg" alt="瓢儿白 （精包装）约400g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-            </div>
-        </div>
-    </div>
-
-    <div class="trace-card" data-code="HLB （JBZ）Y400gSXSFc-34">
-        <h2 class="trace-title">胡萝卜 （精包装）约400g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">胡萝卜 （精包装）约400g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">陕西</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">重庆洁米诺米业连锁有限公司</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-6℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
-                 data-img-1="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg"
-                 data-img-count="2">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="胡萝卜 （精包装）约400g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="胡萝卜 （精包装）约400g检测报告2" onclick="openImgModal(this.parentElement, 1)">
-            </div>
-        </div>
-    </div>
-
-    <div class="trace-card" data-code="XHS （JBZ）Y450gSCSFD-28">
-        <h2 class="trace-title">西红柿 （精包装）约450g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">西红柿 （精包装）约450g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">四川</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">重庆洁米诺米业连锁有限公司</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-7℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg"
-                 data-img-count="1">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="西红柿 （精包装）约450g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-            </div>
-        </div>
-    </div>
-
-    <div class="trace-card" data-code="HXTD Y500gYNPX2-2">
-        <h2 class="trace-title">黄心土豆 约500g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">黄心土豆 约500g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">云南</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">重庆洁米诺米业连锁有限公司</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-8℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg"
-                 data-img-count="1">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyLXn.jpg" alt="黄心土豆 约500g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-            </div>
-        </div>
-    </div>
-
-    <div class="trace-card" data-code="LDY 350gZQSF8-8">
-        <h2 class="trace-title">绿豆芽 350g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">绿豆芽 350g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">重庆</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">沙坪坝区嘉庆调味品经营部</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-9℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
-                 data-img-count="1">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="绿豆芽 350g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-            </div>
-        </div>
-    </div>
-
-    <div class="trace-card" data-code="LDY 350gGZPX7-7">
-        <h2 class="trace-title">绿豆芽 350g 产品溯源信息</h2>
-        <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">绿豆芽 350g</span></div>
-        <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">贵州</span></div>
-        <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">沙坪坝区嘉庆调味品经营部</span></div>
-        <div class="trace-item">
-            <span class="trace-label">保质期：</span><span class="trace-value">7天（冷藏0-10℃）</span></div>
-        <div class="trace-item">
-            <span class="trace-label">检测报告：</span>
-            <div class="report-img-group" 
-                 data-img-0="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg"
-                 data-img-count="1">
-                <img class="report-img" src="https://s41.ax1x.com/2026/02/26/pZxyHpQ.jpg" alt="绿豆芽 350g检测报告1" onclick="openImgModal(this.parentElement, 0)">
-            </div>
-        </div>
-    </div>
-
+    <!-- 图片预览弹窗 -->
     <div class="img-modal" id="imgModal">
         <span class="close-modal" onclick="closeImgModal()">&times;</span>
         <button class="modal-nav-btn prev-btn" onclick="changePage(-1)">&lt;</button>
@@ -297,45 +184,146 @@
     </div>
 
     <script>
+        // ========== 核心配置 ==========
+        // 替换为你实际的JSON文件公网地址
+        const PRODUCTS_DATA_URL = https://gist.githubusercontent.com/heshengyg/653656067078e17ffbd349a1d008ed7e/raw/c97ae825d717db075e30cfccd8dc0c2d907f0eef/products.json;
+        
+        // ========== 全局变量 ==========
         const searchInput = document.getElementById('searchInput');
-        const traceCards = document.querySelectorAll('.trace-card');
         const noResult = document.getElementById('noResult');
+        const loading = document.getElementById('loading');
+        const productCardsContainer = document.getElementById('productCardsContainer');
         const imgModal = document.getElementById('imgModal');
         const modalImg = document.getElementById('modalImg');
         const pageInfo = document.getElementById('pageInfo');
+        
+        let products = []; // 存储加载的产品数据
         let currentImgGroup = null;
         let currentIndex = 0;
         let touchStartX = 0;
         let touchEndX = 0;
         const SWIPE_THRESHOLD = 50;
 
-        function initPage() {
-            traceCards.forEach(card => card.style.display = 'none');
-            noResult.style.display = 'none';
-        }
-        initPage();
+        // ========== 初始化 ==========
+        // 页面加载时获取产品数据
+        window.addEventListener('load', async function() {
+            try {
+                // 加载产品数据
+                await loadProductsData();
+                // 解析URL参数（扫码场景）
+                const code = getUrlParam('code');
+                if (code) {
+                    searchInput.value = code;
+                    handleSearch(code);
+                }
+            } catch (error) {
+                loading.textContent = "数据加载失败，请刷新页面重试";
+                loading.style.color = "#dc3545";
+                console.error("加载产品数据失败：", error);
+            }
+        });
 
+        // ========== 数据加载与渲染 ==========
+        // 从公网加载产品JSON数据
+        async function loadProductsData() {
+            const response = await fetch(PRODUCTS_DATA_URL, {
+                cache: 'no-cache', // 禁用缓存，确保获取最新数据
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`请求失败：${response.status}`);
+            }
+            
+            const data = await response.json();
+            products = data.products || [];
+            
+            // 渲染所有产品卡片
+            renderProductCards();
+            
+            // 隐藏加载提示
+            loading.style.display = 'none';
+        }
+
+        // 动态渲染产品卡片
+        function renderProductCards() {
+            productCardsContainer.innerHTML = ''; // 清空容器
+            
+            products.forEach(product => {
+                // 创建卡片元素
+                const card = document.createElement('div');
+                card.className = 'trace-card';
+                card.dataset.code = product.code;
+                
+                // 构建检测报告图片组HTML
+                let reportImagesHtml = '';
+                product.reportImages.forEach((imgUrl, index) => {
+                    const altText = `${product.name}检测报告${index + 1}`;
+                    reportImagesHtml += `
+                        <img class="report-img" 
+                             src="${imgUrl}" 
+                             alt="${altText}" 
+                             onclick="openImgModal(['${product.reportImages.join("','")}'], ${index})">
+                    `;
+                });
+                
+                // 卡片内容
+                card.innerHTML = `
+                    <h2 class="trace-title">${product.title}</h2>
+                    <div class="trace-item"><span class="trace-label">蔬菜名称：</span><span class="trace-value">${product.name}</span></div>
+                    <div class="trace-item"><span class="trace-label">产地：</span><span class="trace-value">${product.origin}</span></div>
+                    <div class="trace-item"><span class="trace-label">供应商：</span><span class="trace-value">${product.supplier}</span></div>
+                    <div class="trace-item">
+                        <span class="trace-label">保质期：</span><span class="trace-value">${product.shelfLife}</span>
+                    </div>
+                    <div class="trace-item">
+                        <span class="trace-label">检测报告：</span>
+                        <div class="report-img-group">
+                            ${reportImagesHtml}
+                        </div>
+                    </div>
+                `;
+                
+                // 添加到容器
+                productCardsContainer.appendChild(card);
+            });
+        }
+
+        // ========== 搜索功能 ==========
+        // 解析URL参数
         function getUrlParam(name) {
             const params = new URL(window.location.href).searchParams;
             const value = params.get(name);
             return value ? value.trim() : '';
         }
 
+        // 初始化页面（隐藏所有卡片）
+        function initPage() {
+            const traceCards = document.querySelectorAll('.trace-card');
+            traceCards.forEach(card => card.style.display = 'none');
+            noResult.style.display = 'none';
+        }
+
+        // 核心搜索函数
         function handleSearch(filter) {
             initPage();
             if (!filter || filter.trim() === '') return;
 
             let hasMatch = false;
             const lowerFilter = filter.toLowerCase().trim();
+            const traceCards = document.querySelectorAll('.trace-card');
 
-            traceCards.forEach(card => {
-                const productName = card.querySelector('.trace-value').textContent.toLowerCase();
-                const productCode = card.dataset.code.toLowerCase();
+            traceCards.forEach((card, index) => {
+                const product = products[index];
+                const productName = product.name.toLowerCase();
+                const productCode = product.code.toLowerCase();
 
                 if (productName.includes(lowerFilter) || productCode.includes(lowerFilter)) {
                     hasMatch = true;
                     card.style.display = 'block';
-                    if (filter.trim() === card.dataset.code) {
+                    if (filter.trim() === product.code) {
                         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                 }
@@ -344,24 +332,19 @@
             noResult.style.display = hasMatch ? 'none' : 'block';
         }
 
+        // 手动搜索事件
         searchInput.addEventListener('input', function() {
             handleSearch(this.value.trim());
         });
 
-        window.addEventListener('load', function() {
-            const code = getUrlParam('code');
-            if (code) {
-                searchInput.value = code;
-                handleSearch(code);
-            }
-        });
-
-        // 关键修复4：重写openImgModal函数，避免JSON.parse解析
+        // ========== 图片预览功能 ==========
+        // 打开图片预览
         function openImgModal(imgGroup, index) {
-            currentImgGroup = imgGroup;
+            currentImgGroup = Array.isArray(imgGroup) ? imgGroup : [imgGroup];
             currentIndex = index;
-            // 预加载图片确保微信能正常显示
-            const imgUrl = imgGroup.dataset[`img-${index}`];
+            
+            // 预加载图片（兼容微信）
+            const imgUrl = currentImgGroup[currentIndex];
             const tempImg = new Image();
             tempImg.onload = function() {
                 modalImg.src = imgUrl;
@@ -373,103 +356,99 @@
                 updateModalContent();
                 imgModal.style.display = 'flex';
             };
-            tempImg.src = imgUrl;
+            tempImg.src = imgUrl + '?t=' + new Date().getTime();
         }
 
+        // 关闭图片预览
         function closeImgModal() {
             imgModal.style.display = 'none';
             currentImgGroup = null;
             currentIndex = 0;
         }
 
-        // 关键修复5：重写updateModalContent函数
+        // 更新弹窗内容
         function updateModalContent() {
-            if (!currentImgGroup) return;
-            const imgCount = parseInt(currentImgGroup.dataset.imgCount) || 1;
-            const imgUrl = currentImgGroup.dataset[`img-${currentIndex}`];
+            if (!currentImgGroup || currentImgGroup.length === 0) return;
             
-            // 微信浏览器兼容：强制刷新图片
-            modalImg.src = imgUrl + '?t=' + new Date().getTime();
-            pageInfo.textContent = `${currentIndex + 1}/${imgCount}`;
+            // 强制刷新图片（解决微信缓存）
+            modalImg.src = currentImgGroup[currentIndex] + '?t=' + new Date().getTime();
+            pageInfo.textContent = `${currentIndex + 1}/${currentImgGroup.length}`;
             
-            document.querySelector('.prev-btn').style.display = imgCount > 1 ? 'block' : 'none';
-            document.querySelector('.next-btn').style.display = imgCount > 1 ? 'block' : 'none';
+            // 单图时隐藏翻页按钮
+            document.querySelector('.prev-btn').style.display = currentImgGroup.length > 1 ? 'block' : 'none';
+            document.querySelector('.next-btn').style.display = currentImgGroup.length > 1 ? 'block' : 'none';
         }
 
-        // 关键修复6：重写changePage函数
+        // 翻页功能
         function changePage(step) {
-            if (!currentImgGroup) return;
-            const imgCount = parseInt(currentImgGroup.dataset.imgCount) || 1;
-            if (imgCount <= 1) return;
+            if (!currentImgGroup || currentImgGroup.length <= 1) return;
             
             currentIndex += step;
+            // 循环翻页逻辑
             if (currentIndex < 0) {
-                currentIndex = imgCount - 1;
-            } else if (currentIndex >= imgCount) {
+                currentIndex = currentImgGroup.length - 1;
+            } else if (currentIndex >= currentImgGroup.length) {
                 currentIndex = 0;
             }
             
-            // 预加载下一张图片
-            const nextImgUrl = currentImgGroup.dataset[`img-${currentIndex}`];
-            const tempImg = new Image();
-            tempImg.onload = function() {
-                updateModalContent();
-            };
-            tempImg.src = nextImgUrl;
+            updateModalContent();
         }
 
-        // 关键修复7：优化触摸事件，防止事件穿透
+        // ========== 滑动事件处理 ==========
+        // 触摸开始事件
         function handleTouchStart(e) {
-            e.preventDefault(); // 阻止默认行为
+            e.preventDefault();
             touchStartX = e.changedTouches[0].screenX;
         }
 
+        // 鼠标按下事件（兼容PC端）
         function handleMouseDown(e) {
-            e.preventDefault(); // 阻止默认行为
+            e.preventDefault();
             touchStartX = e.screenX;
         }
 
+        // 触摸结束事件
         function handleTouchEnd(e) {
             e.preventDefault();
             touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
         }
 
+        // 鼠标松开事件（兼容PC端）
         function handleMouseUp(e) {
             e.preventDefault();
             touchEndX = e.screenX;
             handleSwipe();
         }
 
+        // 处理滑动逻辑
         function handleSwipe() {
             const swipeDiff = touchStartX - touchEndX;
+            // 左滑→下一页
             if (swipeDiff > SWIPE_THRESHOLD) {
                 changePage(1);
-            } else if (swipeDiff < -SWIPE_THRESHOLD) {
+            }
+            // 右滑→上一页
+            else if (swipeDiff < -SWIPE_THRESHOLD) {
                 changePage(-1);
             }
         }
 
-        // 绑定事件（避免重复绑定）
+        // 绑定滑动事件
         modalImg.addEventListener('touchstart', handleTouchStart, { passive: false });
         modalImg.addEventListener('mousedown', handleMouseDown, { passive: false });
         modalImg.addEventListener('touchend', handleTouchEnd, { passive: false });
         modalImg.addEventListener('mouseup', handleMouseUp, { passive: false });
         modalImg.addEventListener('mouseleave', handleMouseUp, { passive: false });
 
-        // 移除图片点击关闭功能（避免与翻页冲突）
-        // modalImg.addEventListener('click', closeImgModal);
-
+        // 点击弹窗空白处关闭
         imgModal.addEventListener('click', e => {
             if (e.target === imgModal) closeImgModal();
         });
 
-        // 关键修复8：微信浏览器兼容处理
+        // ========== 微信兼容处理 ==========
         if (/(MicroMessenger)/i.test(navigator.userAgent)) {
-            // 微信浏览器额外处理
-            document.addEventListener('WeixinJSBridgeReady', function() {
-                // 微信环境就绪后再执行图片相关操作
-            }, false);
+            document.addEventListener('WeixinJSBridgeReady', function() {}, false);
         }
     </script>
 </body>
