@@ -2,10 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>松鼠逛逛产品溯源查询（动态数据版）</title>
+    <title>松鼠逛逛产品溯源查询</title>
     <style>
-        /* 保持原有样式不变 */
+        /* ========== 原有样式完全保留 ========== */
         body {
             font-family: "Microsoft Yahei", Arial, sans-serif;
             background-color: #f9f9f9;
@@ -32,7 +31,7 @@
             border-radius: 15px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.05);
             padding: 60px;
-            display: none;
+            display: none; /* 默认隐藏，由 JS 控制显示 */
         }
         .trace-title {
             color: #2e8b57;
@@ -176,11 +175,11 @@
 
     <script>
         // ==================== 配置 ====================
-        // 请将下面的 URL 替换为您自己托管的 products.json 的公网地址
-        const JSON_URL = https://gist.githubusercontent.com/heshengyg/25517c42e84676784c45228f59f392b2/raw/7ec2865806d35f22f8b59c33921a971055cc97bd/products.json; // <-- 修改这里
+        // 您的 JSON 公网地址（已填入）
+        const JSON_URL = 'https://gist.githubusercontent.com/heshengyg/653656067078e17ffbd349a1d008ed7e/raw/f4133fff24c4f844d70986829561fe693e1730ac/products.json';
 
         // ==================== 全局变量 ====================
-        let products = [];
+        let products = []; // 存储产品数组
         const searchInput = document.getElementById('searchInput');
         const noResult = document.getElementById('noResult');
         const cardsContainer = document.getElementById('cardsContainer');
@@ -196,23 +195,40 @@
         async function loadProducts() {
             try {
                 const response = await fetch(JSON_URL);
-                if (!response.ok) throw new Error('网络响应错误');
-                products = await response.json();
-                renderAllCards(products);
-                handleUrlSearch(); // 根据 URL 参数自动搜索
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                // 检查数据结构：从 data.products 获取数组
+                if (!data.products || !Array.isArray(data.products)) {
+                    throw new Error('JSON 数据格式错误：缺少 products 数组');
+                }
+                products = data.products;
+                // 加载完成后，只处理 URL 参数，不自动显示所有卡片
+                handleUrlSearch();
             } catch (error) {
                 console.error('加载产品数据失败：', error);
-                noResult.textContent = '数据加载失败，请稍后重试';
+                noResult.innerHTML = `数据加载失败：${error.message}<br>请检查 JSON 地址是否正确，或服务器是否允许跨域访问。`;
                 noResult.style.display = 'block';
             }
         }
 
-        // ==================== 渲染所有卡片 ====================
-        function renderAllCards(productsToRender) {
+        // ==================== 渲染卡片（内部使用）====================
+        function renderCards(productsToRender) {
+            if (!Array.isArray(productsToRender)) {
+                console.error('renderCards 参数不是数组', productsToRender);
+                noResult.innerHTML = '内部错误：产品数据格式异常，无法显示。';
+                noResult.style.display = 'block';
+                return;
+            }
             cardsContainer.innerHTML = ''; // 清空容器
             productsToRender.forEach(product => {
                 const card = createCard(product);
                 cardsContainer.appendChild(card);
+            });
+            // 将所有新卡片设置为可见
+            document.querySelectorAll('.trace-card').forEach(card => {
+                card.style.display = 'block';
             });
         }
 
@@ -222,9 +238,10 @@
             cardDiv.className = 'trace-card';
             cardDiv.dataset.code = product.code;
 
-            // 构建图片 HTML
+            // 使用 product.reportImages 字段（与 JSON 一致）
+            const images = product.reportImages || [];
             let imagesHtml = '';
-            product.images.forEach((imgUrl, index) => {
+            images.forEach((imgUrl, index) => {
                 imagesHtml += `<img class="report-img" src="${imgUrl}" alt="${product.name}检测报告${index+1}" onclick="openImgModal(this.parentElement, ${index})">`;
             });
 
@@ -236,7 +253,7 @@
                 <div class="trace-item"><span class="trace-label">保质期：</span><span class="trace-value">${product.shelfLife}</span></div>
                 <div class="trace-item">
                     <span class="trace-label">检测报告：</span>
-                    <div class="report-img-group" data-imgs='${JSON.stringify(product.images)}'>
+                    <div class="report-img-group" data-imgs='${JSON.stringify(images)}'>
                         ${imagesHtml}
                     </div>
                 </div>
@@ -251,20 +268,29 @@
             return value ? value.trim() : '';
         }
 
-        // ==================== 根据 URL 参数执行搜索（扫码自动填充） ====================
+        // ==================== 根据 URL 参数执行搜索 ====================
         function handleUrlSearch() {
             const code = getUrlParam('code');
             if (code) {
                 searchInput.value = code;
                 handleSearch(code);
+            } else {
+                // 没有参数时，确保容器为空，不显示任何卡片
+                cardsContainer.innerHTML = '';
+                noResult.style.display = 'none';
             }
         }
 
         // ==================== 核心搜索函数 ====================
         function handleSearch(filter) {
+            if (!Array.isArray(products) || products.length === 0) {
+                // 数据未加载时，不执行搜索
+                return;
+            }
+
             if (!filter || filter.trim() === '') {
-                // 搜索框为空，显示所有卡片
-                renderAllCards(products);
+                // 搜索框为空：清空卡片，隐藏提示
+                cardsContainer.innerHTML = '';
                 noResult.style.display = 'none';
                 return;
             }
@@ -276,7 +302,7 @@
             });
 
             if (matchedProducts.length > 0) {
-                renderAllCards(matchedProducts);
+                renderCards(matchedProducts);
                 noResult.style.display = 'none';
                 // 如果输入的是精确编码，滚动到第一个匹配卡片
                 if (matchedProducts.some(p => p.code.toLowerCase() === lowerFilter)) {
@@ -285,11 +311,12 @@
                 }
             } else {
                 cardsContainer.innerHTML = ''; // 清空卡片
+                noResult.innerHTML = '未找到匹配的商品信息';
                 noResult.style.display = 'block';
             }
         }
 
-        // ==================== 图片预览相关函数（全局挂载） ====================
+        // ==================== 图片预览相关函数 ====================
         window.openImgModal = function(imgGroup, index) {
             currentImgGroup = JSON.parse(imgGroup.dataset.imgs);
             currentIndex = index;
