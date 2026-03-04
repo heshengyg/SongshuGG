@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>松鼠逛逛产品溯源查询</title>
+    <title>松鼠逛逛产品溯源查询（防缓存版）</title>
     <style>
         /* ========== 原有样式完全保留 ========== */
         body {
@@ -175,8 +175,8 @@
 
     <script>
         // ==================== 配置 ====================
-        // 您的 JSON 公网地址（已填入）
-        const JSON_URL = 'https://gist.githubusercontent.com/heshengyg/653656067078e17ffbd349a1d008ed7e/raw/f4133fff24c4f844d70986829561fe693e1730ac/products.json';
+        // 您的 JSON 公网地址（原始地址，不带缓存参数）
+        const BASE_JSON_URL = 'https://gist.githubusercontent.com/heshengyg/653656067078e17ffbd349a1d008ed7e/raw/products.json';
 
         // ==================== 全局变量 ====================
         let products = []; // 存储产品数组
@@ -191,10 +191,13 @@
         const SWIPE_THRESHOLD = 50;
         let touchStartX = 0;
 
-        // ==================== 加载数据 ====================
+        // ==================== 加载数据（带防缓存处理）====================
         async function loadProducts() {
             try {
-                const response = await fetch(JSON_URL);
+                // 生成一个唯一的时间戳参数，防止缓存
+                const timestamp = Date.now(); // 毫秒时间戳
+                const url = `${BASE_JSON_URL}?_t=${timestamp}`;
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status} ${response.statusText}`);
                 }
